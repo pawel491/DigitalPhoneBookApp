@@ -1,3 +1,4 @@
+using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -32,6 +33,23 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.MapGet("/test-db", async (IConfiguration config) =>
+{
+    var connectionString = config.GetConnectionString("DefaultConnection");
+    
+    try
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+        
+        return Results.Ok("Successfully connected with postgresql db");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Sth went wrong: {ex.Message}");
+    }
+});
 
 app.Run();
 
