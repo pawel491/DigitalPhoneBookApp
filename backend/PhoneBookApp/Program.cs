@@ -55,6 +55,8 @@ app.MapGet("/test-db", async (IConfiguration config) =>
     }
 });
 
+app.InitializeDatabase();
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
