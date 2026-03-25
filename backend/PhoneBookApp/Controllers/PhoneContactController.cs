@@ -6,7 +6,7 @@ using PhoneBookApp.Mappers;
 
 namespace PhoneBookApp.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/contacts")]
 [ApiController]
 public class PhoneContactController : ControllerBase
 {
@@ -20,7 +20,7 @@ public class PhoneContactController : ControllerBase
     public async Task<IActionResult> GetPhoneContacts()
     {
         var phoneContacts = await _dbContext.PhoneContacts.ToListAsync();
-        
+
         var dtos = phoneContacts.Select(pc => pc.ToDto());
         return Ok(dtos);
     }
