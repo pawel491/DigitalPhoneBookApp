@@ -16,8 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
     <Folder Include="Data\" />
+    <Folder Include="Mappers\" />
     <Folder Include="Model\" />
+    <Folder Include="Model\Dto\" />
     <Folder Include="Model\Entities\" />
   </ItemGroup>
 
