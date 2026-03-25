@@ -22,6 +22,8 @@
     <Folder Include="Model\" />
     <Folder Include="Model\Dto\" />
     <Folder Include="Model\Entities\" />
+    <Folder Include="Model\Enums\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
