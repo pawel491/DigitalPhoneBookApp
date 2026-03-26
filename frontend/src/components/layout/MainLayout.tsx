@@ -1,4 +1,15 @@
+import type { Contact } from "../../types";
+import { ContactList } from '../contacts/ContactList';
+
+const DUMMY_CONTACTS: Contact[] = [
+  { id: 1, name: "John Doe", phoneNumber: "+1 234 567 890" },
+  { id: 2, name: "Alice Smith", phoneNumber: "+44 987 654 321" },
+];
+
 export function MainLayout() {
+  const handleEdit = (contact: Contact) => console.log("Editing:", contact);
+  const handleDelete = (id: number) => console.log("Deleting id:", id);
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-100 font-sans">
       
@@ -12,9 +23,11 @@ export function MainLayout() {
             </button>
           </header>
           
-          <div className="text-slate-500 text-center py-10 border-2 border-dashed border-slate-200 rounded-lg">
-            list of contacts...
-          </div>
+          <ContactList 
+            contacts={DUMMY_CONTACTS} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
+          />
         </div>
       </main>
 
