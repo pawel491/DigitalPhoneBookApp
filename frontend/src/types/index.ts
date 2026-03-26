@@ -3,3 +3,11 @@ export interface Contact {
     name: string;
     phoneNumber: string;
 }
+export interface CreateContactDto {
+    name: string;
+    phoneNumber: string;
+}
+export interface AiResponse {
+    message: string;
+    contact?: Contact;
+}
