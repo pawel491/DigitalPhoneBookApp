@@ -11,7 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddHttpClient<INaturalLanguageInterpreter, GeminiLanguageInterpreter>();
-
+builder.Services.AddScoped<IActionExecutorService, ActionExecutorService>();
 builder.Services.AddControllers();
 
 var app = builder.Build();

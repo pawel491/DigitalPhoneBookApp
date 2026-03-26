@@ -20,6 +20,7 @@
     <Folder Include="Data\" />
     <Folder Include="Mappers\" />
     <Folder Include="Model\" />
+    <Folder Include="Model\Common\" />
     <Folder Include="Model\Dto\" />
     <Folder Include="Model\Entities\" />
     <Folder Include="Model\Enums\" />
