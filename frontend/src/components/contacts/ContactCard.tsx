@@ -5,11 +5,16 @@ interface ContactCardProps {
   contact: Contact;
   onEdit: (contact: Contact) => void;
   onDelete: (id: number) => void;
+  isSelected?: boolean;
 }
 
-export function ContactCard({ contact, onEdit, onDelete }: ContactCardProps) {
+export function ContactCard({ contact, onEdit, onDelete, isSelected }: ContactCardProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+    <div className={`p-4 flex items-center justify-between rounded-lg border transition-all duration-200 ${
+      isSelected 
+        ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-400' // selected state
+        : 'bg-white border-slate-200 hover:shadow-md'                // default state
+    }`}>
       
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">

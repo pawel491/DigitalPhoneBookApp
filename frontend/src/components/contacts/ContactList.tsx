@@ -5,9 +5,10 @@ interface ContactListProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
   onDelete: (id: number) => void;
+  selectedId?: number | null;
 }
 
-export function ContactList({ contacts, onEdit, onDelete }: ContactListProps) {
+export function ContactList({ contacts, onEdit, onDelete, selectedId }: ContactListProps) {
   if (!contacts || contacts.length === 0) {
     return (
       <div className="text-slate-500 text-center py-10 border-2 border-dashed border-slate-200 rounded-lg">
@@ -24,6 +25,7 @@ export function ContactList({ contacts, onEdit, onDelete }: ContactListProps) {
           contact={contact} 
           onEdit={onEdit} 
           onDelete={onDelete} 
+          isSelected={contact.id === selectedId}
         />
       ))}
     </div>

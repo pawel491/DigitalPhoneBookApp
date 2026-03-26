@@ -88,6 +88,7 @@ export function MainLayout() {
               contacts={contacts}
               onEdit={handleEdit} 
               onDelete={handleDelete} 
+              selectedId={selectedContact?.id}
             />
           ) }
         </div>
