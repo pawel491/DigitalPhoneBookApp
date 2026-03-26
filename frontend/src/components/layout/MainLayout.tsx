@@ -74,11 +74,22 @@ export function MainLayout() {
             </button>
           </header>
 
-          <ContactList 
-            contacts={contacts}
-            onEdit={handleEdit} 
-            onDelete={handleDelete} 
-          />
+          {error ? (
+            <div className="text-red-500 text-center py-10 bg-red-50 rounded-lg border border-red-200">
+              {error}
+            </div>
+          ) : isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+              <p>Fetching contacts...</p>
+            </div>
+          ) : (
+            <ContactList 
+              contacts={contacts}
+              onEdit={handleEdit} 
+              onDelete={handleDelete} 
+            />
+          ) }
         </div>
       </main>
 
