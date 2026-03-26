@@ -47,9 +47,9 @@ public class PhoneContactController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreatePhoneContact([FromBody] PhoneContactDto phoneContactDto)
+    public async Task<IActionResult> CreatePhoneContact([FromBody] CreatePhoneContactDto dto)
     {
-        var phoneContact = phoneContactDto.ToEntity();
+        var phoneContact = dto.ToEntity();
 
         _dbContext.PhoneContacts.Add(phoneContact);
         await _dbContext.SaveChangesAsync();
@@ -58,7 +58,7 @@ public class PhoneContactController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePhoneContact([FromBody] PhoneContactDto phoneContactDto, int id)
+    public async Task<IActionResult> UpdatePhoneContact([FromBody] CreatePhoneContactDto dto, int id)
     {
         var phoneContact = await _dbContext.PhoneContacts.FindAsync(id);
         if (phoneContact == null)
@@ -66,7 +66,7 @@ public class PhoneContactController : ControllerBase
             return NotFound();
         }
 
-        phoneContact.UpdateEntity(phoneContactDto);
+        phoneContact.UpdateEntity(dto);
         await _dbContext.SaveChangesAsync();
 
         return NoContent();
