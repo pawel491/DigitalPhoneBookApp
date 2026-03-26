@@ -59,7 +59,7 @@ public class ActionExecutorService : IActionExecutorService
 
         _dbContext.PhoneContacts.Remove(contactToDelete);
         await _dbContext.SaveChangesAsync();
-        return ServiceResult.Success(new { Message = "Contact deleted successfully." });
+        return ServiceResult.Success(new { Message = "Contact deleted successfully.", Contact = (PhoneContactDto?)null });
     }
 
     private async Task<ServiceResult> ExecuteGetActionAsync(LlmCommandResultDto result)
@@ -68,7 +68,7 @@ public class ActionExecutorService : IActionExecutorService
         if (contact == null)
             return ServiceResult.NotFound("No contact found matching the LLM's criteria.");
 
-        return ServiceResult.Success(contact.ToDto());
+        return ServiceResult.Success(new {Message = "Found contact successfully.", Contact = contact.ToDto()});
     }
 
     private async Task<ServiceResult> ExecuteUpdateActionAsync(LlmCommandResultDto result)
@@ -83,7 +83,7 @@ public class ActionExecutorService : IActionExecutorService
             contactToUpdate.PhoneNumber = result.PhoneNumber;
 
         await _dbContext.SaveChangesAsync();
-        return ServiceResult.Success(new { Message = "Contact updated successfully." });
+        return ServiceResult.Success(new { Message = "Contact updated successfully.", Contact = contactToUpdate.ToDto() });
     }
 
     private async Task<PhoneContact?> FindTargetContactAsync(string? targetName, string? targetPhoneNumber)
