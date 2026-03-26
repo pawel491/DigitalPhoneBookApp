@@ -1,6 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using PhoneBookApp.Data;
+using PhoneBookApp.Mappers;
 using PhoneBookApp.Model.Common;
 using PhoneBookApp.Model.Dto;
 using PhoneBookApp.Model.Entities;
@@ -47,7 +48,7 @@ public class ActionExecutorService : IActionExecutorService
 
         _dbContext.PhoneContacts.Add(newContact);
         await _dbContext.SaveChangesAsync();
-        return ServiceResult.Success(newContact);
+        return ServiceResult.Success(new { Message = "Contact added successfully.", Contact = newContact.ToDto() });
     }
 
     private async Task<ServiceResult> ExecuteDeleteActionAsync(LlmCommandResultDto result)
@@ -58,7 +59,7 @@ public class ActionExecutorService : IActionExecutorService
 
         _dbContext.PhoneContacts.Remove(contactToDelete);
         await _dbContext.SaveChangesAsync();
-        return ServiceResult.Success();
+        return ServiceResult.Success(new { Message = "Contact deleted successfully." });
     }
 
     private async Task<ServiceResult> ExecuteGetActionAsync(LlmCommandResultDto result)
@@ -67,7 +68,7 @@ public class ActionExecutorService : IActionExecutorService
         if (contact == null)
             return ServiceResult.NotFound("No contact found matching the LLM's criteria.");
 
-        return ServiceResult.Success(contact);
+        return ServiceResult.Success(contact.ToDto());
     }
 
     private async Task<ServiceResult> ExecuteUpdateActionAsync(LlmCommandResultDto result)
@@ -82,7 +83,7 @@ public class ActionExecutorService : IActionExecutorService
             contactToUpdate.PhoneNumber = result.PhoneNumber;
 
         await _dbContext.SaveChangesAsync();
-        return ServiceResult.Success(contactToUpdate);
+        return ServiceResult.Success(new { Message = "Contact updated successfully." });
     }
 
     private async Task<PhoneContact?> FindTargetContactAsync(string? targetName, string? targetPhoneNumber)
