@@ -1,0 +1,43 @@
+export function MainLayout() {
+  return (
+    <div className="flex flex-col md:flex-row h-screen bg-slate-100 font-sans">
+      
+      {/* Left col: Phone Book */}
+      <main className="w-full md:w-3/5 p-6 overflow-y-auto">
+        <div className="bg-white rounded-xl shadow-sm p-6 min-h-full border border-slate-200">
+          <header className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-slate-800">My contacts</h1>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              + New Contact
+            </button>
+          </header>
+          
+          <div className="text-slate-500 text-center py-10 border-2 border-dashed border-slate-200 rounded-lg">
+            list of contacts...
+          </div>
+        </div>
+      </main>
+
+      {/* Right col: AI Chat */}
+      <aside className="w-full md:w-2/5 bg-slate-50 border-l border-slate-200 flex flex-col">
+        <div className="p-6 bg-white border-b border-slate-200 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            AI Assistant
+          </h2>
+          <p className="text-sm text-slate-500 mt-1">Manage contacts with natural language</p>
+        </div>
+        
+        <div className="flex-1 p-6 overflow-y-auto">
+          <div className="bg-blue-50 text-blue-800 p-4 rounded-lg rounded-tl-none inline-block max-w-[80%]">
+            Hello! How can I help you today? Try typing: "Add John with phone number 123-456-789".
+          </div>
+        </div>
+
+        <div className="p-4 bg-white border-t border-slate-200">
+          <div className="text-slate-400 text-center text-sm">Type your message here...</div>
+        </div>
+      </aside>
+
+    </div>
+  );
+}
