@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import type { Contact } from "../../types";
+import type { Contact, CreateContactDto } from "../../types";
 import { ContactList } from '../contacts/ContactList';
 import { api } from "../../services/api";
+import { ContactFormModal } from "../contacts/ContactFormModal";
 
 export function MainLayout() {
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,8 +28,14 @@ export function MainLayout() {
     }
   };
 
+  const handleCreateNew = () => {
+    setSelectedContact(null);
+    setIsModalOpen(true);
+  };
+
   const handleEdit = (contact: Contact) => {
-    console.log("tobe implemented...");
+    setSelectedContact(contact);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -39,6 +48,17 @@ export function MainLayout() {
     }
   };
 
+  const handleFormSubmit = async (contactData: CreateContactDto) => {
+    if (selectedContact) { // edit mode
+      await api.update(selectedContact.id, contactData);
+    } else {
+      // create mode
+      await api.add(contactData);
+    }
+    // refresh to get latest data
+    await fetchContacts();
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-100 font-sans">
       
@@ -47,11 +67,13 @@ export function MainLayout() {
         <div className="bg-white rounded-xl shadow-sm p-6 min-h-full border border-slate-200">
           <header className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-slate-800">My contacts</h1>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              onClick = {handleCreateNew}
+            >
               + New Contact
             </button>
           </header>
-          
+
           <ContactList 
             contacts={contacts}
             onEdit={handleEdit} 
@@ -79,7 +101,12 @@ export function MainLayout() {
           <div className="text-slate-400 text-center text-sm">Type your message here...</div>
         </div>
       </aside>
-
+      <ContactFormModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleFormSubmit}
+        initialData={selectedContact}
+      />
     </div>
   );
 }
