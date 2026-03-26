@@ -1,14 +1,43 @@
+import { useEffect, useState } from "react";
 import type { Contact } from "../../types";
 import { ContactList } from '../contacts/ContactList';
-
-const DUMMY_CONTACTS: Contact[] = [
-  { id: 1, name: "John Doe", phoneNumber: "+1 234 567 890" },
-  { id: 2, name: "Alice Smith", phoneNumber: "+44 987 654 321" },
-];
+import { api } from "../../services/api";
 
 export function MainLayout() {
-  const handleEdit = (contact: Contact) => console.log("Editing:", contact);
-  const handleDelete = (id: number) => console.log("Deleting id:", id);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const fetchContacts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await api.getAll();
+      setContacts(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to load contacts. Is the backend running?");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (contact: Contact) => {
+    console.log("tobe implemented...");
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this contact?")) return;
+    try {
+      await api.delete(id);
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      alert("Failed to delete contact. Please try again.");
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-100 font-sans">
@@ -24,7 +53,7 @@ export function MainLayout() {
           </header>
           
           <ContactList 
-            contacts={DUMMY_CONTACTS} 
+            contacts={contacts}
             onEdit={handleEdit} 
             onDelete={handleDelete} 
           />
