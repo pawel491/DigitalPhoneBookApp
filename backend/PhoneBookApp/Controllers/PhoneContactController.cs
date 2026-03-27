@@ -8,6 +8,7 @@ using PhoneBookApp.Services;
 using PhoneBookApp.Model.Enums;
 using PhoneBookApp.Model.Entities;
 using PhoneBookApp.Model.Common;
+using PhoneBookApp.Exceptions;
 
 namespace PhoneBookApp.Controllers;
 
@@ -90,19 +91,23 @@ public class PhoneContactController : ControllerBase
     [HttpPost("ask")]
     public async Task<IActionResult> AskQuestion([FromBody] InterpretCommandDto commandDto)
     {
-        LlmCommandResultDto result = await _naturalLanguageInterpreter.InterpretAsync(commandDto.CommandInNaturalLanguage);
-
-        ServiceResult executionResult = await _actionExecutor.ExecuteActionAsync(result);
-
-        if(!executionResult.IsSuccess)
+        try
         {
-            if(executionResult.IsNotFound)
-                return NotFound(executionResult.ErrorMessage);
-            else
-                return BadRequest(executionResult.ErrorMessage);
+            LlmCommandResultDto result = await _naturalLanguageInterpreter.InterpretAsync(commandDto.CommandInNaturalLanguage);
+            ServiceResult executionResult = await _actionExecutor.ExecuteActionAsync(result);
+
+            if(!executionResult.IsSuccess)
+            {
+                if(executionResult.IsNotFound)
+                    return NotFound(executionResult.ErrorMessage);
+                else
+                    return BadRequest(executionResult.ErrorMessage);
+            }
+            return Ok(executionResult.Data);
+        } catch (RateLimitException ex)
+        {
+            return StatusCode(StatusCodes.Status429TooManyRequests, ex.Message);
         }
-        
-        return Ok(executionResult.Data);
     }
 
 }

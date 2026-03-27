@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.Json;
+using PhoneBookApp.Exceptions;
 using PhoneBookApp.Model.Dto;
 using PhoneBookApp.Model.Enums;
 
@@ -75,6 +76,10 @@ public class GeminiLanguageInterpreter : INaturalLanguageInterpreter
             var result = JsonSerializer.Deserialize<LlmCommandResultDto>(extractedJsonString!, options);
 
             return result ?? new LlmCommandResultDto { Action = LlmAction.Unknown };
+        }
+        catch (HttpRequestException httpEx) when (httpEx.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            throw new RateLimitException("Rate limit exceeded for Gemini API. Please try again later.", httpEx);
         }
         catch (Exception ex)
         {
