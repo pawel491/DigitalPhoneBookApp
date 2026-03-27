@@ -4,14 +4,15 @@ import { ContactList } from '../contacts/ContactList';
 import { api } from "../../services/api";
 import { ContactFormModal } from "../contacts/ContactFormModal";
 import { AIChat } from "../chat/AIChat";
+import { useContacts } from "../../hooks/useContacts";
 
 export function MainLayout() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const { contacts, isLoading, error, fetchContacts, addOrUpdateContact, deleteContact } = useContacts();
+  
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
+  // Auto scroll to selected contact
   useEffect(() => {
     if(selectedContact) {
       const element = document.getElementById(`contact-${selectedContact.id}`);
@@ -21,22 +22,6 @@ export function MainLayout() {
     }
   }, [selectedContact, contacts]);
 
-  useEffect(() => {
-    fetchContacts();
-  }, []);
-
-  const fetchContacts = async () => {
-    try {
-      setIsLoading(true);
-      const data = await api.getAll();
-      setContacts(data);
-      setError(null);
-    } catch (err) {
-      setError("Failed to load contacts. Is the backend running?");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleContactSelect = (contact: Contact) => {
     setSelectedContact(contact);
@@ -53,26 +38,21 @@ export function MainLayout() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this contact?")) return;
-    try {
-      await api.delete(id);
-      setContacts((prev) => prev.filter((c) => c.id !== id));
+    const isSuccess = await deleteContact(id);
+    if (isSuccess && selectedContact?.id === id) {
       setSelectedContact(null);
-    } catch (err) {
-      alert("Failed to delete contact. Please try again.");
     }
   };
 
   const handleFormSubmit = async (contactData: CreateContactDto) => {
-    if (selectedContact) { // edit mode
-      await api.update(selectedContact.id, contactData);
-    } else {
-      // create mode
-      const newContact = await api.add(contactData);
-      setSelectedContact(newContact);
+    try {
+      const newContact = await addOrUpdateContact(contactData, selectedContact?.id);
+      if(newContact) {
+        setSelectedContact(newContact);
+      } 
+    } catch (err) {
+      console.error(err);
     }
-    // refresh to get latest data
-    await fetchContacts();
   };
 
   return (
