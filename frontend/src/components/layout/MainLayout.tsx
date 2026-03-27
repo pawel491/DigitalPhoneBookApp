@@ -111,7 +111,6 @@ export function MainLayout() {
         isOpen={isModalOpen}
         onClose={() => { 
           setIsModalOpen(false);
-          setSelectedContact(null);
         }} 
         onSubmit={handleFormSubmit}
         initialData={selectedContact}
