@@ -38,6 +38,10 @@ export function MainLayout() {
     }
   };
 
+  const handleContactSelect = (contact: Contact) => {
+    setSelectedContact(contact);
+  };
+
   const handleCreateNew = () => {
     setSelectedContact(null);
     setIsModalOpen(true);
@@ -53,6 +57,7 @@ export function MainLayout() {
     try {
       await api.delete(id);
       setContacts((prev) => prev.filter((c) => c.id !== id));
+      setSelectedContact(null);
     } catch (err) {
       alert("Failed to delete contact. Please try again.");
     }
@@ -63,7 +68,8 @@ export function MainLayout() {
       await api.update(selectedContact.id, contactData);
     } else {
       // create mode
-      await api.add(contactData);
+      const newContact = await api.add(contactData);
+      setSelectedContact(newContact);
     }
     // refresh to get latest data
     await fetchContacts();
@@ -99,6 +105,7 @@ export function MainLayout() {
               onEdit={handleEdit} 
               onDelete={handleDelete} 
               selectedId={selectedContact?.id}
+              onSelect={handleContactSelect}
             />
           ) }
         </div>
@@ -122,7 +129,10 @@ export function MainLayout() {
       </aside>
       <ContactFormModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { 
+          setIsModalOpen(false);
+          setSelectedContact(null);
+        }} 
         onSubmit={handleFormSubmit}
         initialData={selectedContact}
       />
