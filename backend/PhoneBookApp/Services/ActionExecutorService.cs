@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using PhoneBookApp.Data;
 using PhoneBookApp.Mappers;
@@ -106,14 +107,25 @@ public class ActionExecutorService : IActionExecutorService
             case LlmAction.Add:
                 if(string.IsNullOrEmpty(result.Name) || string.IsNullOrEmpty(result.PhoneNumber))
                     return "LLM did not return necessary information to add a contact.";
+                if(!IsValidPhoneNumber(result.PhoneNumber))
+                    return "LLM returned an invalid phone number format.";
+                break;
+            case LlmAction.Update:
+                if(!string.IsNullOrEmpty(result.PhoneNumber) && !IsValidPhoneNumber(result.PhoneNumber))
+                    return "LLM returned an invalid phone number format for the update.";
+                if(string.IsNullOrEmpty(result.TargetName) && string.IsNullOrEmpty(result.TargetPhoneNumber))
+                    return $"LLM did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
                 break;
             case LlmAction.Delete:
             case LlmAction.Get:
-            case LlmAction.Update:
                 if(string.IsNullOrEmpty(result.TargetName) && string.IsNullOrEmpty(result.TargetPhoneNumber))
                     return $"LLM did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
                 break;
         } 
         return null;
+    }
+    private bool IsValidPhoneNumber(string phoneNumber)
+    {
+        return Regex.IsMatch(phoneNumber, @"^\+?[0-9\s\-()]{7,15}$");
     }
 }
