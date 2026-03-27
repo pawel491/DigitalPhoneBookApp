@@ -11,6 +11,7 @@ interface ContactFormProps {
 export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: ContactFormProps) {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -28,11 +29,20 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name.trim() || !phoneNumber.trim()) return;
+    const trimmedPhone = phoneNumber.trim();
+    const trimmedName = name.trim();
 
+    if (!trimmedName || !trimmedPhone) return;
+
+    const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
+    if (!phoneRegex.test(trimmedPhone)) {
+      setPhoneError("Invalid phone format (7-15 digits, spaces/dash allowed).");
+      return;
+    }
     try {
+      setPhoneError("");
       setIsSubmitting(true);
-      await onSubmit({ name: name.trim(), phoneNumber: phoneNumber.trim() });
+      await onSubmit({ name: trimmedName, phoneNumber: trimmedPhone });
       onClose();
     } catch (error) {
       console.error(error);
@@ -65,13 +75,23 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
             <input 
-              type="text"
+              type="tel"
               required
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+                if (phoneError) setPhoneError("");
+              }}
+              className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 transition-colors ${
+                phoneError 
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-500'
+              }`}
               placeholder="e.g. +1 234 567 890"
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1 animate-fadeIn">{phoneError}</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 mt-4">
