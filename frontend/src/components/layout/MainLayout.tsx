@@ -12,6 +12,15 @@ export function MainLayout() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if(selectedContact) {
+      const element = document.getElementById(`contact-${selectedContact.id}`);
+      if(element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [selectedContact]);
+
+  useEffect(() => {
     fetchContacts();
   }, []);
 

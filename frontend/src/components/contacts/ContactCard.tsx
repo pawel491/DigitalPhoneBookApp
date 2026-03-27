@@ -10,7 +10,8 @@ interface ContactCardProps {
 
 export function ContactCard({ contact, onEdit, onDelete, isSelected }: ContactCardProps) {
   return (
-    <div className={`p-4 flex items-center justify-between rounded-lg border transition-all duration-200 ${
+    <div id={`contact-${contact.id}`}
+      className={`p-4 flex items-center justify-between rounded-lg border transition-all duration-200 ${
       isSelected 
         ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-400' // selected state
         : 'bg-white border-slate-200 hover:shadow-md'                // default state
