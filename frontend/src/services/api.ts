@@ -1,6 +1,6 @@
 import type { AiResponse, Contact, CreateContactDto } from '../types';
 
-const API_BASE_URL = 'http://localhost:5207/api/contacts';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5207/api/contacts';
 
 export const api = {
     async getAll(): Promise<Contact[]> {
