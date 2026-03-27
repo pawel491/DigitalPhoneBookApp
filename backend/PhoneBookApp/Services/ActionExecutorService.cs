@@ -35,7 +35,7 @@ public class ActionExecutorService : IActionExecutorService
             case LlmAction.Update:
                 return await ExecuteUpdateActionAsync(result);
             default:
-                return ServiceResult.BadRequest("LLM did not understand your command.");
+                return ServiceResult.BadRequest("AI assistant did not understand your command.");
         }
     }
 
@@ -67,7 +67,7 @@ public class ActionExecutorService : IActionExecutorService
     {
         var contact = await FindTargetContactAsync(result.TargetName, result.TargetPhoneNumber);
         if (contact == null)
-            return ServiceResult.NotFound("No contact found matching the LLM's criteria.");
+            return ServiceResult.NotFound("No contact found matching the criteria.");
 
         return ServiceResult.Success(new {Message = "Found contact successfully.", Contact = contact.ToDto()});
     }
@@ -76,7 +76,7 @@ public class ActionExecutorService : IActionExecutorService
     {
         var contactToUpdate = await FindTargetContactAsync(result.TargetName, result.TargetPhoneNumber);
         if (contactToUpdate == null)
-            return ServiceResult.NotFound("No contact found matching the LLM's criteria for update.");
+            return ServiceResult.NotFound("No contact found matching the criteria for update.");
 
         if(!string.IsNullOrEmpty(result.Name))
             contactToUpdate.Name = result.Name;
@@ -106,20 +106,20 @@ public class ActionExecutorService : IActionExecutorService
         {
             case LlmAction.Add:
                 if(string.IsNullOrEmpty(result.Name) || string.IsNullOrEmpty(result.PhoneNumber))
-                    return "LLM did not return necessary information to add a contact.";
+                    return "AI assistant did not return necessary information to add a contact.";
                 if(!IsValidPhoneNumber(result.PhoneNumber))
-                    return "LLM returned an invalid phone number format.";
+                    return "AI assistant returned an invalid phone number format.";
                 break;
             case LlmAction.Update:
                 if(!string.IsNullOrEmpty(result.PhoneNumber) && !IsValidPhoneNumber(result.PhoneNumber))
-                    return "LLM returned an invalid phone number format for the update.";
+                    return "AI assistant returned an invalid phone number format for the update.";
                 if(string.IsNullOrEmpty(result.TargetName) && string.IsNullOrEmpty(result.TargetPhoneNumber))
-                    return $"LLM did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
+                    return $"AI assistant did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
                 break;
             case LlmAction.Delete:
             case LlmAction.Get:
                 if(string.IsNullOrEmpty(result.TargetName) && string.IsNullOrEmpty(result.TargetPhoneNumber))
-                    return $"LLM did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
+                    return $"AI assistant did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
                 break;
         } 
         return null;

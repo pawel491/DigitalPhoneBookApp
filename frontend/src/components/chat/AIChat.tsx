@@ -43,7 +43,7 @@ export function AIChat({ onActionSuccess, onContactSelect }: AIChatProps) {
       }
       await onActionSuccess(); 
     } catch (err: any) {
-      setMessages(prev => [...prev, { id: Date.now().toString(), text: `Error: ${err.message}`, isUser: false }]);
+      setMessages(prev => [...prev, { id: Date.now().toString(), text: `${err.message}`, isUser: false }]);
     } finally {
       setIsLoading(false);
     }
