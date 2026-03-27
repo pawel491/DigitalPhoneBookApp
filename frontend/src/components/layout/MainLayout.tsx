@@ -3,6 +3,7 @@ import type { Contact, CreateContactDto } from "../../types";
 import { ContactList } from '../contacts/ContactList';
 import { api } from "../../services/api";
 import { ContactFormModal } from "../contacts/ContactFormModal";
+import { AIChat } from "../chat/AIChat";
 
 export function MainLayout() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -18,7 +19,7 @@ export function MainLayout() {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-  }, [selectedContact]);
+  }, [selectedContact, contacts]);
 
   useEffect(() => {
     fetchContacts();
@@ -112,14 +113,11 @@ export function MainLayout() {
           <p className="text-sm text-slate-500 mt-1">Manage contacts with natural language</p>
         </div>
         
-        <div className="flex-1 p-6 overflow-y-auto">
-          <div className="bg-blue-50 text-blue-800 p-4 rounded-lg rounded-tl-none inline-block max-w-[80%]">
-            Hello! How can I help you today? Try typing: "Add John with phone number 123-456-789".
-          </div>
-        </div>
-
-        <div className="p-4 bg-white border-t border-slate-200">
-          <div className="text-slate-400 text-center text-sm">Type your message here...</div>
+        <div className="flex-1 overflow-hidden">
+          <AIChat 
+            onActionSuccess={fetchContacts} 
+            onContactSelect={setSelectedContact} 
+          />
         </div>
       </aside>
       <ContactFormModal 
