@@ -6,6 +6,7 @@ A modern web application that functions as a digital phone book, allowing users 
 * **Natural Language Processing:** Add, edit, delete, and retrieve contacts simply by chatting with the built-in AI assistant. When you ask the AI for a specific contact, the UI automatically scrolls to and highlights it in the list!
 * **Standard CRUD:** A clean, traditional UI to manually manage contacts alongside the AI chat.
 * **Robust Validation:** Server-side and client-side validation for phone numbers and missing data.
+* **Data Integrity:** Contact names and phone numbers are enforced to be unique at the database level to prevent duplicates and ensure accuracy during AI-driven updates.
 * **Zero-Setup Database:** Automated Entity Framework migrations and data seeding on startup.
 
 ## Tech Stack
@@ -50,6 +51,8 @@ You can use the chat interface on the right side of the screen to interact with 
 * "Update John's number to +1 987 654 321."
 * "Delete Joanna from my contacts."
 
+*Note on AI Stability: This application uses the free tier of the Google Gemini API. Due to high global demand on Google's servers, the AI service may occasionally experience hiccups and return 5xx (Service Unavailable) errors. The application is built to handle these gracefully. If the AI is temporarily unresponsive, please wait a moment and try again, or use the standard UI for your operations.*
+
 ## Stopping the App
 To stop the containers and clean up the environment, run:
 
@@ -57,3 +60,5 @@ To stop the containers and clean up the environment, run:
 
 ---
 *This project was developed as a Coding Task for S&P Global Energy internship recruitment.*
+
+Contact names and phone numbers are enforced to be unique at the database level to ensure data integrity during AI-driven updates.
