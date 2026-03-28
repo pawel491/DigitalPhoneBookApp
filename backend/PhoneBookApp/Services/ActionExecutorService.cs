@@ -13,9 +13,11 @@ namespace PhoneBookApp.Services;
 public class ActionExecutorService : IActionExecutorService
 {
     private readonly AppDbContext _dbContext;
-    public ActionExecutorService(AppDbContext dbContext)
+    private readonly IContactValidator _validator;
+    public ActionExecutorService(AppDbContext dbContext, IContactValidator validator)
     {
         this._dbContext = dbContext;
+        this._validator = validator;
     }
 
     public async Task<ServiceResult> ExecuteActionAsync(LlmCommandResultDto result)
@@ -41,6 +43,9 @@ public class ActionExecutorService : IActionExecutorService
 
     private async Task<ServiceResult> ExecuteAddActionAsync(LlmCommandResultDto result)
     {
+        var error = await _validator.CheckForDuplicatesAsync(result.Name, result.PhoneNumber);
+        if(error != null) return ServiceResult.BadRequest(error);
+
         PhoneContact newContact = new PhoneContact
         {
             Name = result.Name!,
@@ -78,6 +83,10 @@ public class ActionExecutorService : IActionExecutorService
         if (contactToUpdate == null)
             return ServiceResult.NotFound("No contact found matching the criteria for update.");
 
+        var error = await _validator.CheckForDuplicatesAsync(result.Name, result.PhoneNumber, contactToUpdate.Id);
+        if(error != null) 
+            return ServiceResult.BadRequest(error);
+
         if(!string.IsNullOrEmpty(result.Name))
             contactToUpdate.Name = result.Name;
         if(!string.IsNullOrEmpty(result.PhoneNumber))
@@ -107,11 +116,11 @@ public class ActionExecutorService : IActionExecutorService
             case LlmAction.Add:
                 if(string.IsNullOrEmpty(result.Name) || string.IsNullOrEmpty(result.PhoneNumber))
                     return "AI assistant did not return necessary information to add a contact.";
-                if(!IsValidPhoneNumber(result.PhoneNumber))
+                if(!_validator.IsValidPhoneNumber(result.PhoneNumber))
                     return "AI assistant returned an invalid phone number format.";
                 break;
             case LlmAction.Update:
-                if(!string.IsNullOrEmpty(result.PhoneNumber) && !IsValidPhoneNumber(result.PhoneNumber))
+                if(!string.IsNullOrEmpty(result.PhoneNumber) && !_validator.IsValidPhoneNumber(result.PhoneNumber))
                     return "AI assistant returned an invalid phone number format for the update.";
                 if(string.IsNullOrEmpty(result.TargetName) && string.IsNullOrEmpty(result.TargetPhoneNumber))
                     return $"AI assistant did not return necessary information to identify the target contact to {result.Action.ToString().ToLower()}.";
@@ -123,9 +132,5 @@ public class ActionExecutorService : IActionExecutorService
                 break;
         } 
         return null;
-    }
-    private bool IsValidPhoneNumber(string phoneNumber)
-    {
-        return Regex.IsMatch(phoneNumber, @"^\+?[0-9\s\-()]{7,15}$");
     }
 }

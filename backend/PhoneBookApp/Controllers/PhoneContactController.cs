@@ -19,12 +19,14 @@ public class PhoneContactController : ControllerBase
     private readonly AppDbContext _dbContext;
     private readonly INaturalLanguageInterpreter _naturalLanguageInterpreter;
     private readonly IActionExecutorService _actionExecutor;
+    private readonly IContactValidator _validator;
 
-    public PhoneContactController(AppDbContext dbContext, INaturalLanguageInterpreter naturalLanguageInterpreter, IActionExecutorService actionExecutor)
+    public PhoneContactController(AppDbContext dbContext, INaturalLanguageInterpreter naturalLanguageInterpreter, IActionExecutorService actionExecutor, IContactValidator validator)
     {
         this._dbContext = dbContext;
         this._naturalLanguageInterpreter = naturalLanguageInterpreter;
         this._actionExecutor = actionExecutor;
+        this._validator = validator;
     }
 
     [HttpGet]
@@ -50,6 +52,9 @@ public class PhoneContactController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreatePhoneContact([FromBody] CreatePhoneContactDto dto)
     {
+        var error = await _validator.CheckForDuplicatesAsync(dto.Name, dto.PhoneNumber);
+        if(error != null) return BadRequest(error);
+
         var phoneContact = dto.ToEntity();
 
         _dbContext.PhoneContacts.Add(phoneContact);
@@ -66,6 +71,9 @@ public class PhoneContactController : ControllerBase
         {
             return NotFound();
         }
+
+        var error = await _validator.CheckForDuplicatesAsync(dto.Name, dto.PhoneNumber, id);
+        if(error != null) return BadRequest(error);
 
         phoneContact.UpdateEntity(dto);
         await _dbContext.SaveChangesAsync();

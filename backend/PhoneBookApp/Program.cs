@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddHttpClient<INaturalLanguageInterpreter, GeminiLanguageInterpreter>();
 builder.Services.AddScoped<IActionExecutorService, ActionExecutorService>();
+builder.Services.AddScoped<IContactValidator, ContactValidator>();
 builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
