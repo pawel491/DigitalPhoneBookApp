@@ -81,6 +81,10 @@ public class GeminiLanguageInterpreter : INaturalLanguageInterpreter
         {
             throw new RateLimitException("Rate limit exceeded for Gemini API. Please try again later.", httpEx);
         }
+        catch (HttpRequestException httpEx) when (httpEx.StatusCode >= System.Net.HttpStatusCode.InternalServerError)
+        {
+            throw new ExternalServiceException("AI servers are temporarily overloaded. Please try again in a moment.", httpEx);
+        }
         catch (Exception ex)
         {
             return new LlmCommandResultDto { Action = LlmAction.Unknown };

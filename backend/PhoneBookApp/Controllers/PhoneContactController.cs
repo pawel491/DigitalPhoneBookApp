@@ -107,6 +107,9 @@ public class PhoneContactController : ControllerBase
         } catch (RateLimitException ex)
         {
             return StatusCode(StatusCodes.Status429TooManyRequests, ex.Message);
+        } catch (ExternalServiceException ex)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
         }
     }
 
