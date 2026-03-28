@@ -21,6 +21,9 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.PhoneNumber).IsRequired();
+
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasIndex(e => e.PhoneNumber).IsUnique();
         });
     }
 
