@@ -12,9 +12,11 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState("");
+  const [apiError, setApiError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    setApiError("");
     //edit mode
     if (initialData) {
       setName(initialData.name);
@@ -40,13 +42,14 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
       return;
     }
     try {
+      setApiError("");
       setPhoneError("");
       setIsSubmitting(true);
       await onSubmit({ name: trimmedName, phoneNumber: trimmedPhone });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Failed to save contact. Please try again.");
+      setApiError(error.message || "Failed to save contact. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -59,6 +62,11 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
           {initialData ? 'Edit Contact' : 'New Contact'}
         </h2>
         
+        {apiError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            {apiError}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
@@ -66,7 +74,10 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
               type="text"
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (apiError) setApiError("");
+              }}
               className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               placeholder="e.g. John Doe"
             />
@@ -81,6 +92,7 @@ export function ContactFormModal({ isOpen, onClose, onSubmit, initialData }: Con
               onChange={(e) => {
                 setPhoneNumber(e.target.value);
                 if (phoneError) setPhoneError("");
+                if (apiError) setApiError("");
               }}
               className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 transition-colors ${
                 phoneError 

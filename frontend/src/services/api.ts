@@ -15,7 +15,10 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contact),
         });
-        if (!response.ok) throw new Error('Failed to add contact');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to add contact');
+        }
         return response.json();
     },
 
@@ -25,7 +28,10 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contact),
         });
-        if (!response.ok) throw new Error('Failed to update contact');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to update contact');
+        }
     },
 
     async delete(id: number): Promise<void> {

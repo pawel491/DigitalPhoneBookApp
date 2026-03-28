@@ -45,14 +45,11 @@ export function MainLayout() {
   };
 
   const handleFormSubmit = async (contactData: CreateContactDto) => {
-    try {
-      const newContact = await addOrUpdateContact(contactData, selectedContact?.id);
-      if(newContact) {
-        setSelectedContact(newContact);
-      } 
-    } catch (err) {
-      console.error(err);
-    }
+    // passes possible exceptions to modal
+    const newContact = await addOrUpdateContact(contactData, selectedContact?.id);
+    if(newContact) {
+      setSelectedContact(newContact);
+    } 
   };
 
   return (

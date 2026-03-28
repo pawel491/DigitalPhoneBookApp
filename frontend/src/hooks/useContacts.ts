@@ -29,19 +29,15 @@ export function useContacts() {
         contactData: CreateContactDto,
         selectedContactId?: number
     ): Promise<Contact | null> => {
-        try {
-            if (selectedContactId) { // edit mode
-                await api.update(selectedContactId, contactData);
-                await fetchContacts();
-                return null;
-            } else { // create mode
-                const newContact = await api.add(contactData);
-                await fetchContacts();
-                return newContact;
-            }
-        } catch (err) {
-            alert("Failed to save contact.");
-            throw err;
+        // passes possible exceptions to caller for better handling
+        if (selectedContactId) { // edit mode
+            await api.update(selectedContactId, contactData);
+            await fetchContacts();
+            return null;
+        } else { // create mode
+            const newContact = await api.add(contactData);
+            await fetchContacts();
+            return newContact;
         }
     };
 
