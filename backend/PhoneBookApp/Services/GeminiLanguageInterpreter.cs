@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using PhoneBookApp.Exceptions;
@@ -56,7 +57,26 @@ public class GeminiLanguageInterpreter : INaturalLanguageInterpreter
         try
         {
             var response = await _httpClient.PostAsync(_requestUrl, content);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.BadRequest:
+                        throw new ExternalServiceException("Invalid Gemini API Key or malformed request. Please check your configuration.", new HttpRequestException(null, null, HttpStatusCode.BadRequest));
+                    
+                    case HttpStatusCode.Unauthorized:
+                    case HttpStatusCode.Forbidden:
+                        throw new ExternalServiceException("Invalid or missing Gemini API Key. Please check your .env file.", new HttpRequestException(null, null, response.StatusCode));
+                    
+                    case HttpStatusCode.TooManyRequests:
+                        throw new RateLimitException("Rate limit exceeded for Gemini API. Please try again later.", new HttpRequestException(null, null, HttpStatusCode.TooManyRequests));
+                    
+                    default:
+                        if ((int)response.StatusCode >= 500)
+                            throw new ExternalServiceException("AI servers are temporarily overloaded. Please try again in a moment.", new HttpRequestException(null, null, response.StatusCode));
+                        throw new HttpRequestException($"Gemini API returned an error: {response.StatusCode}");
+                }
+            }
             var responseJson = await response.Content.ReadAsStringAsync();
 
             // unpack the Gemini response to get the generated JSON string
@@ -77,16 +97,11 @@ public class GeminiLanguageInterpreter : INaturalLanguageInterpreter
 
             return result ?? new LlmCommandResultDto { Action = LlmAction.Unknown };
         }
-        catch (HttpRequestException httpEx) when (httpEx.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-        {
-            throw new RateLimitException("Rate limit exceeded for Gemini API. Please try again later.", httpEx);
-        }
-        catch (HttpRequestException httpEx) when (httpEx.StatusCode >= System.Net.HttpStatusCode.InternalServerError)
-        {
-            throw new ExternalServiceException("AI servers are temporarily overloaded. Please try again in a moment.", httpEx);
-        }
+        catch (RateLimitException) { throw; }
+        catch (ExternalServiceException) { throw; }
         catch (Exception ex)
         {
+            Console.WriteLine($"Unexpected error while calling Gemini API: {ex.Message}");
             return new LlmCommandResultDto { Action = LlmAction.Unknown };
         }
     }
